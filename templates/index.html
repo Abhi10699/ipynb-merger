@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bootstrap demo</title>
+  <!-- <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"> -->
+
+  <style>
+    * {
+      padding: 0;
+      margin: 0;
+      box-sizing: border-box;
+    }
+
+    html {
+      font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    }
+
+    .center-all {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+    }
+
+    .file-preview-container {
+      display: grid;
+      grid-template-columns: repeat(4, auto);
+    }
+
+    .file-preview {
+      font-size: 10px;
+      text-align: center;
+      border: 1px dashed;
+      margin: 1px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    .drop-zone {
+      width: 300px;
+      height: 200px;
+      border: 2px dashed #292929;
+      border-radius: 10px;
+      padding: 20px;
+      font-size: 1.2em;
+      cursor: pointer;
+    }
+
+    .drop-message {
+      margin-bottom: 15px;
+    }
+
+    .drop-zone.hover {
+      border-color: #008000;
+    }
+
+    .container {
+      width: 100%;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .merge-btn {
+      background-color: unset;
+      border: unset;
+      margin-top: 20px;
+      width: 100%;
+      padding: 15px;
+
+      border: 3px solid black;
+      border-radius: 20px;
+    }
+
+    .mt-10 {
+      margin-top: 20px;
+    }
+
+    .bmc-btn {
+      width: 100%;
+      text-align: center;
+    }
+
+    .text {
+      margin-bottom: 20px;
+    }
+
+    .footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin-left: auto;
+      margin-right: auto;
+      margin-bottom: 20px;
+      width: 200px;
+      /* Need a specific value to work */
+    }
+  </style>
+
+
+</head>
+
+<body>
+  <div class="container">
+    <h1 class="mt-10">Python Notebook Merger</h1>
+    <p class="mt-10">Export your notebooks as <code>.html</code> and merge them with this tool :)</p>
+    <div class="mt-10">
+      <div class="drop-zone center-all " id="drop-zone">
+        <div class="drop-message" id="drop-message">Drag & Drop files here or click to upload</div>
+        <input type="file" id="file-input" multiple name="file">
+      </div>
+      <button type="button" onclick="uploadFiles()" class="merge-btn">Merge</button>
+    </div>
+    <script data-name="BMC-Widget" data-cfasync="false" src="https://cdnjs.buymeacoffee.com/1.0.0/widget.prod.min.js"
+      data-id="abhi10699" data-description="Support me on Buy me a coffee!"
+      data-message="Thank you for visiting! If you find this tool helpful, please feel free to show some love by buying me a coffee"
+      data-color="#FF813F" data-position="Right" data-x_margin="18" data-y_margin="18"></script>
+  </div>
+
+  <p class="footer">Made with ❤️ by <a href="https://www.github.com/Abhi10699">Abhi</a></p>
+
+</body>
+<script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+
+<script>
+  const dropZone = document.getElementById('drop-zone');
+  const dropMessage = document.getElementById('drop-message');
+  const fileInput = document.getElementById('file-input');
+  const formElem = document.getElementById("form_elem")
+
+
+  dropZone.addEventListener('dragover', (e) => {
+    e.preventDefault();
+    dropZone.classList.add('hover');
+    dropMessage.textContent = 'Drop files here';
+  });
+
+  dropZone.addEventListener('dragleave', () => {
+    dropZone.classList.remove('hover');
+    dropMessage.textContent = 'Drag & Drop files here or click to upload';
+  });
+
+  dropZone.addEventListener('drop', (e) => {
+    e.preventDefault();
+    const files = e.dataTransfer.files;
+    if (files.length > 0) {
+      const allHtml = Array.from(files).every(file => file.type == "text/html")
+      if (!allHtml) {
+        alert("Can only accept html files")
+        return
+      }
+      fileInput.files = files;
+    }
+    dropZone.classList.remove('hover');
+    displayFilePreviews(files);
+    console.log(fileInput)
+  });
+
+  fileInput.addEventListener('change', () => {
+    const files = fileInput.files;
+    displayFilePreviews(files);
+  });
+
+
+  async function uploadFiles() {
+    const formData = new FormData();
+    console.log(fileInput.files)
+
+    // push images
+
+    Array.from(fileInput.files).forEach(file => formData.append('file', file))
+
+    try {
+      const api = "/merge"
+      const apiResp = await axios.post(api, formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+        responseType: 'blob'
+      })
+      const apiRespBody = await apiResp.data
+      const blob = new Blob([apiRespBody], { type: 'text/html' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', 'file_combined.html');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    catch (err) {
+      console.log(err)
+    }
+
+  }
+
+
+  function displayFilePreviews(files) {
+    dropZone.classList.remove(["center-all"])
+    dropZone.classList.add(["file-preview-container"])
+
+    dropZone.innerHTML = ''; // Clear previous previews
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const preview = document.createElement('div');
+        preview.classList.add('file-preview');
+        preview.innerHTML = `
+          <img class="mt-10" src="https://raw.githubusercontent.com/redbooth/free-file-icons/master/16px/html.png"/>
+          <span class="file-name">${file.name}</span>
+        `;
+        dropZone.appendChild(preview);
+      };
+      reader.readAsDataURL(file);
+    });
+  }
+</script>
+
+</html>

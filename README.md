@@ -1,6 +1,14 @@
-# PyMergeNotebooks
+# IPython Notebook Merger
 
-PyMergeNotebooks is a Python tool designed to merge multiple Jupyter notebooks and generate a single HTML file for easy submission or sharing. It simplifies the process of combining notebooks and presenting them in a cohesive format.
+A Python tool designed to merge multiple Jupyter notebooks and generate a single HTML file for easy submission or sharing. It simplifies the process of combining notebooks and presenting them in a cohesive format.
+
+## Purpose
+
+During College Homework Submission, our professor expects all the work in a single HTML file, which means we have to combine all the notebooks and convert them to HTML. Doing this everytime costs alot of time and is not efficient. Thus I made this tool for my classmates and myself to make this process easier for everybody :)
+
+## Limitation
+
+- Only works with notebooks exported from certain version of jupyter-notebook. Not sure which one.. **Future Enhancement**
 
 ## Installation
 
@@ -22,7 +30,4 @@ pip install -r requirements.txt
 4. Merge Files
 ```bash
 python app.py ./1.html ./2.html -o ./merged.html
-``` 
-
-## Contributing
-Contributions are welcome! Please feel free to open an issue or submit a pull request for any improvements or additional features you'd like to see.
+```

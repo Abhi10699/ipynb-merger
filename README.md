@@ -10,6 +10,11 @@ During College Homework Submission, our professor expects all the work in a sing
 
 - Only works with notebooks exported from certain version of jupyter-notebook. Not sure which one.. **Future Enhancement**
 
+## Versions
+
+- [CLI](https://github.com/Abhi10699/ipynb-merger/)
+- [WebUI](https://github.com/Abhi10699/ipynb-merger/tree/webapp)
+
 ## Installation
 
 1. Clone Repository
